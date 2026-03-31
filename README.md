@@ -175,16 +175,19 @@ Risk Levels:
 ![Home Page](screenshots/home.png)
 
 ### 🛍️ Products Page
-![Products Page](screenshots/All Products.png)
+![Products Page](screenshots/All_Products.png)
 
 ### 📦 Product Detail
-![Product Detail](screenshots/Product details.png)
+![Product Detail](screenshots/Product_details.png)
 
 ### 🛒 Cart Page
 ![Cart Page](screenshots/cart.png)
 
 ### 💳 Checkout Page
-![Checkout Page](screenshots/checkout page.png)
+![Checkout Page](screenshots/checkout_page.png)
+
+### ✅ Order Success Page
+![Order Success Page](screenshots/order_success_page.png)
 
 ### 🔧 Admin Dashboard
 ![Admin Dashboard](screenshots/dashboard.png)
