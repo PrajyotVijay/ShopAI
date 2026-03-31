@@ -171,15 +171,26 @@ Risk Levels:
 
 ## 📸 Screenshots
 
-| Page | Description |
-|---|---|
-| Home | Hero banner, categories, featured products, AI recommendations |
-| Products | Grid layout with search and filters |
-| Product Detail | Images, reviews, ratings, recommendations |
-| Cart | Items with +/- quantity controls |
-| Checkout | Delivery form with payment options |
-| Admin Dashboard | Stats, charts, recent orders |
-| Admin Orders | Fraud risk scores, status update |
+### 🏠 Home Page
+![Home Page](screenshots/home.png)
+
+### 🛍️ Products Page
+![Products Page](screenshots/All Products.png)
+
+### 📦 Product Detail
+![Product Detail](screenshots/Product details.png)
+
+### 🛒 Cart Page
+![Cart Page](screenshots/cart.png)
+
+### 💳 Checkout Page
+![Checkout Page](screenshots/checkout page.png)
+
+### 🔧 Admin Dashboard
+![Admin Dashboard](screenshots/dashboard.png)
+
+### 📊 Admin Orders & Fraud Detection
+![Admin Orders](screenshots/orders.png)
 
 ---
 
