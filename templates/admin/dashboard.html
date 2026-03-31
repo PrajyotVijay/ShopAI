@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block title %}ShopAI - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-2 admin-sidebar rounded-4 py-4 me-3">
+            <h6 class="text-white fw-bold px-3 mb-4">
+                <i class="bi bi-speedometer2 me-2"></i>Admin Panel
+            </h6>
+            <nav class="nav flex-column">
+                <a class="nav-link active" href="/admin">
+                    <i class="bi bi-house me-2"></i>Dashboard
+                </a>
+                <a class="nav-link" href="/admin/products">
+                    <i class="bi bi-box me-2"></i>Products
+                </a>
+                <a class="nav-link" href="/admin/orders">
+                    <i class="bi bi-bag me-2"></i>Orders
+                </a>
+                <a class="nav-link" href="/admin/categories">
+                    <i class="bi bi-tags me-2"></i>Categories
+                </a>
+                <hr class="border-secondary">
+                <a class="nav-link text-danger" href="/logout">
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+
+            <h3 class="fw-bold mb-4">Dashboard Overview</h3>
+
+            <!-- Stats Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm rounded-4 bg-primary text-white">
+                        <div class="card-body p-3 text-center">
+                            <i class="bi bi-people" style="font-size: 1.8rem;"></i>
+                            <h3 class="fw-bold mt-2 mb-0">{{ total_users }}</h3>
+                            <p class="mb-0 small">Total Users</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm rounded-4 bg-success text-white">
+                        <div class="card-body p-3 text-center">
+                            <i class="bi bi-box" style="font-size: 1.8rem;"></i>
+                            <h3 class="fw-bold mt-2 mb-0">{{ total_products }}</h3>
+                            <p class="mb-0 small">Products</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card border-0 shadow-sm rounded-4 bg-warning text-dark">
+                        <div class="card-body p-3 text-center">
+                            <i class="bi bi-bag" style="font-size: 1.8rem;"></i>
+                            <h3 class="fw-bold mt-2 mb-0">{{ total_orders }}</h3>
+                            <p class="mb-0 small">Orders</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm rounded-4 bg-danger text-white">
+                        <div class="card-body p-3 text-center">
+                            <i class="bi bi-shield-exclamation" style="font-size: 1.8rem;"></i>
+                            <h3 class="fw-bold mt-2 mb-0">{{ high_risk_orders }}</h3>
+                            <p class="mb-0 small">High Risk Orders</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm rounded-4 bg-info text-white">
+                        <div class="card-body p-3 text-center">
+                            <i class="bi bi-currency-rupee" style="font-size: 1.8rem;"></i>
+                            <h3 class="fw-bold mt-2 mb-0">₹{{ "%.0f"|format(total_revenue) }}</h3>
+                            <p class="mb-0 small">Total Revenue</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Chart -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart me-2"></i>Sales Overview</h5>
+                    <canvas id="salesChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>Recent Orders</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>User ID</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Fraud Risk</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td><strong>#{{ order['id'] }}</strong></td>
+                                    <td>{{ order['user_id'] }}</td>
+                                    <td class="text-primary fw-bold">₹{{ "%.2f"|format(order['total_amount']) }}</td>
+                                    <td><span class="badge bg-success">{{ order['status'] }}</span></td>
+                                    <td>
+                                        <span class="badge {% if order['fraud_risk_score'] > 0.5 %}bg-danger{% elif order['fraud_risk_score'] > 0.2 %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                                            {{ order['fraud_risk_score'] }}
+                                        </span>
+                                    </td>
+                                    <td class="small text-muted">{{ order['created_at'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ chart_labels | tojson }},
+        datasets: [{
+            label: 'Sales (₹)',
+            data: {{ chart_data | tojson }},
+            backgroundColor: 'rgba(13, 110, 253, 0.7)',
+            borderColor: 'rgba(13, 110, 253, 1)',
+            borderWidth: 1,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(0,0,0,0.05)' }
+            },
+            x: {
+                grid: { display: false }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

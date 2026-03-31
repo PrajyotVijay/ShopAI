@@ -1,0 +1,128 @@
+/* General */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: 400px;
+}
+
+/* Category Cards */
+.category-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+/* Product Cards */
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+/* Footer */
+footer a:hover {
+    color: #fff !important;
+}
+
+/* Admin Sidebar */
+.admin-sidebar {
+    min-height: 100vh;
+    background-color: #1a1a2e;
+}
+
+.admin-sidebar .nav-link {
+    color: #a0a0b0;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 2px 0;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+/* Badges */
+.badge {
+    font-size: 0.75rem;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 10px;
+}
+
+/* Forms */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Cards */
+.card {
+    border-radius: 12px;
+}
+
+/* Footer links fix */
+footer .text-muted {
+    color: #adb5bd !important;
+}
+
+footer ul li {
+    margin-bottom: 5px;
+}
+
+/* Loading Spinner */
+#loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+.spinner-container {
+    text-align: center;
+}
+
+.spinner-container p {
+    margin-top: 15px;
+    font-weight: 600;
+    color: #0d6efd;
+    font-size: 1rem;
+}

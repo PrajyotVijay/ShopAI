@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}ShopAI - Admin Categories{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-2 admin-sidebar rounded-4 py-4 me-3">
+            <h6 class="text-white fw-bold px-3 mb-4">
+                <i class="bi bi-speedometer2 me-2"></i>Admin Panel
+            </h6>
+            <nav class="nav flex-column">
+                <a class="nav-link" href="/admin">
+                    <i class="bi bi-house me-2"></i>Dashboard
+                </a>
+                <a class="nav-link" href="/admin/products">
+                    <i class="bi bi-box me-2"></i>Products
+                </a>
+                <a class="nav-link" href="/admin/orders">
+                    <i class="bi bi-bag me-2"></i>Orders
+                </a>
+                <a class="nav-link active" href="/admin/categories">
+                    <i class="bi bi-tags me-2"></i>Categories
+                </a>
+                <hr class="border-secondary">
+                <a class="nav-link text-danger" href="/logout">
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">Manage Categories</h3>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                    <i class="bi bi-plus-lg me-2"></i>Add Category
+                </button>
+            </div>
+
+            <!-- Categories Grid -->
+            <div class="row g-3 mb-4">
+                {% for cat in categories %}
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm rounded-4 text-center">
+                        <div class="card-body py-4">
+                            <i class="bi {{ cat['icon'] }} text-primary" style="font-size: 2rem;"></i>
+                            <h6 class="fw-bold mt-2">{{ cat['name'] }}</h6>
+                            <a href="/admin/categories/delete/{{ cat['id'] }}"
+                               class="btn btn-outline-danger btn-sm mt-2"
+                               onclick="return confirm('Delete {{ cat['name'] }} category?')">
+                                <i class="bi bi-trash me-1"></i>Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Bootstrap Icons Reference -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-info-circle me-2"></i>Available Icons Reference
+                    </h6>
+                    <p class="text-muted small">Use these icon names when adding a category:</p>
+                    <div class="row g-2">
+                        {% set icons = [
+                            ('bi-cpu', 'Electronics'),
+                            ('bi-bag', 'Fashion'),
+                            ('bi-book', 'Books'),
+                            ('bi-watch', 'Accessories'),
+                            ('bi-house', 'Home'),
+                            ('bi-phone', 'Mobile'),
+                            ('bi-camera', 'Camera'),
+                            ('bi-bicycle', 'Sports'),
+                            ('bi-heart', 'Health'),
+                            ('bi-music-note', 'Music'),
+                            ('bi-controller', 'Gaming'),
+                            ('bi-car-front', 'Automotive'),
+                            ('bi-flower1', 'Garden'),
+                            ('bi-brush', 'Art'),
+                            ('bi-baby', 'Kids'),
+                            ('bi-gem', 'Jewellery')
+                        ] %}
+                        {% for icon, name in icons %}
+                        <div class="col-md-3 col-6">
+                            <div class="d-flex align-items-center gap-2 p-2 border rounded-3">
+                                <i class="bi {{ icon }} text-primary"></i>
+                                <div>
+                                    <p class="mb-0 small fw-semibold">{{ name }}</p>
+                                    <code style="font-size: 0.7rem;">{{ icon }}</code>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/admin/categories/add">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category Name</label>
+                        <input type="text" name="name" class="form-control"
+                               placeholder="e.g. Gaming" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Icon Name</label>
+                        <input type="text" name="icon" class="form-control"
+                               placeholder="e.g. bi-controller" value="bi-tag">
+                        <div class="form-text">Check the icon reference below for available icons</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

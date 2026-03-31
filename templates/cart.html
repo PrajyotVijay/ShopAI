@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}ShopAI - Cart{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4"><i class="bi bi-cart3 me-2"></i>Your Cart</h2>
+
+        {% if cart_items %}
+        <div class="row">
+            <!-- Cart Items -->
+            <div class="col-md-8">
+                {% for item in cart_items %}
+                <div class="card border-0 shadow-sm rounded-4 mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <!-- Product Image -->
+                            <div class="col-3 col-md-2">
+                                <img src="{{ item['image_url'] }}"
+                                     alt="{{ item['name'] }}"
+                                     class="img-fluid rounded"
+                                     style="height: 70px; object-fit: cover;">
+                            </div>
+                            <!-- Product Info -->
+                            <div class="col-5 col-md-5">
+                                <h6 class="fw-bold mb-1">{{ item['name'] }}</h6>
+                                <span class="badge bg-primary small">{{ item['category'] }}</span>
+                                <p class="text-primary fw-bold mb-0 mt-1">₹{{ "%.2f"|format(item['price']) }}</p>
+                            </div>
+                            <!-- Quantity -->
+                            <div class="col-4 col-md-3">
+                                <form method="POST" action="/cart/update" id="form-{{ item['cart_id'] }}">
+                                    <input type="hidden" name="cart_id" value="{{ item['cart_id'] }}">
+                                    <input type="hidden" name="quantity" id="qty-{{ item['cart_id'] }}" value="{{ item['quantity'] }}">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                onclick="changeQty('{{ item['cart_id'] }}', -1)">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <span class="fw-bold px-2" id="qty-display-{{ item['cart_id'] }}">{{ item['quantity'] }}</span>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                onclick="changeQty('{{ item['cart_id'] }}', 1)">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- Remove -->
+                            <div class="col-12 col-md-2 text-end mt-2 mt-md-0">
+                                <a href="/cart/remove/{{ item['cart_id'] }}"
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Order Summary</h5>
+                        <hr>
+                        {% for item in cart_items %}
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">{{ item['name'] }} x {{ item['quantity'] }}</span>
+                            <span>₹{{ "%.2f"|format(item['price'] * item['quantity']) }}</span>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Total</span>
+                            <span class="text-primary">₹{{ "%.2f"|format(total) }}</span>
+                        </div>
+                        <a href="/checkout" class="btn btn-primary w-100 mt-3 fw-bold py-2">
+                            <i class="bi bi-credit-card me-2"></i>Proceed to Checkout
+                        </a>
+                        <a href="/products" class="btn btn-outline-secondary w-100 mt-2">
+                            <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+            <h4 class="mt-3 text-muted">Your cart is empty!</h4>
+            <p class="text-muted">Add some products to get started</p>
+            <a href="/products" class="btn btn-primary mt-2">
+                <i class="bi bi-grid me-2"></i>Browse Products
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function changeQty(cartId, change) {
+    let qtyInput = document.getElementById('qty-' + cartId);
+    let qtyDisplay = document.getElementById('qty-display-' + cartId);
+    let newQty = parseInt(qtyInput.value) + change;
+
+    if (newQty < 1) newQty = 1;
+    if (newQty > 10) newQty = 10;
+
+    qtyInput.value = newQty;
+    qtyDisplay.innerText = newQty;
+
+    document.getElementById('form-' + cartId).submit();
+}
+</script>
+{% endblock %}

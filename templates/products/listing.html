@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block title %}ShopAI - Products{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="fw-bold">All Products</h2>
+                <p class="text-muted">Showing {{ products|length }} products</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Filters Sidebar -->
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-2"></i>Filters</h5>
+                        <form method="GET" action="/products">
+
+                            <!-- Search -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Search</label>
+                                <input type="text" name="search" class="form-control form-control-sm"
+                                       placeholder="Search products..."
+                                       value="{{ request.args.get('search', '') }}">
+                            </div>
+
+                            <!-- Category Filter -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Category</label>
+                                <select name="category" class="form-select form-select-sm">
+                                    <option value="">All Categories</option>
+                                    {% for cat in categories %}
+                                    <option value="{{ cat['name'] }}" {% if request.args.get('category') == cat['name'] %}selected{% endif %}>
+                                        {{ cat['name'] }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Price Filter -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold small">Max Price (₹)</label>
+                                <input type="number" name="max_price" class="form-control form-control-sm"
+                                       placeholder="e.g. 2000"
+                                       value="{{ request.args.get('max_price', '') }}">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-search me-1"></i>Apply Filters
+                            </button>
+                            <a href="/products" class="btn btn-outline-secondary btn-sm w-100 mt-2">
+                                <i class="bi bi-x me-1"></i>Clear Filters
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="col-md-9">
+                <div class="row g-4">
+                    {% if products %}
+                        {% for product in products %}
+                        <div class="col-sm-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0 product-card">
+                                <img src="{{ product['image_url'] }}"
+                                     class="card-img-top"
+                                     alt="{{ product['name'] }}"
+                                     style="height: 200px; object-fit: cover;">
+                                <div class="card-body d-flex flex-column">
+                                    <span class="badge bg-primary mb-2 align-self-start">{{ product['category'] }}</span>
+                                    <h6 class="card-title fw-bold">{{ product['name'] }}</h6>
+                                    <p class="text-muted small flex-grow-1">{{ product['description'][:60] }}...</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="fs-5 fw-bold text-primary">₹{{ "%.2f"|format(product['price']) }}</span>
+                                        <a href="/products/{{ product['id'] }}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <div class="text-center py-5">
+                                <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+                                <h5 class="mt-3 text-muted">No products found!</h5>
+                                <a href="/products" class="btn btn-primary mt-2">View All Products</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <div class="d-flex justify-content-center mt-5">
+                <nav>
+                    <ul class="pagination">
+                        <!-- Previous -->
+                        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page-1 }}&search={{ request.args.get('search','') }}&category={{ request.args.get('category','') }}&max_price={{ request.args.get('max_price','') }}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        <!-- Page Numbers -->
+                        {% for p in range(1, total_pages + 1) %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link" href="?page={{ p }}&search={{ request.args.get('search','') }}&category={{ request.args.get('category','') }}&max_price={{ request.args.get('max_price','') }}">
+                                {{ p }}
+                            </a>
+                        </li>
+                        {% endfor %}
+
+                        <!-- Next -->
+                        <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page+1 }}&search={{ request.args.get('search','') }}&category={{ request.args.get('category','') }}&max_price={{ request.args.get('max_price','') }}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

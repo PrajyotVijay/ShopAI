@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}ShopAI - Home{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">
+                    Shop Smarter<br>with <span class="text-warning">AI</span>
+                </h1>
+                <p class="lead mt-3">
+                    Discover products tailored for you with AI-powered recommendations
+                    and secure fraud-protected checkout.
+                </p>
+                <a href="/products" class="btn btn-warning btn-lg mt-3 fw-bold">
+                    <i class="bi bi-grid me-2"></i>Browse Products
+                </a>
+            </div>
+            <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                <i class="bi bi-bag-heart-fill text-white" style="font-size: 10rem; opacity: 0.2;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4 text-center">Shop by Category</h2>
+        <div class="row g-3 justify-content-center">
+            {% for cat in categories %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="/products?category={{ cat['name'] }}" class="text-decoration-none">
+                    <div class="card text-center border-0 shadow-sm h-100 category-card">
+                        <div class="card-body py-4">
+                            <i class="bi {{ cat['icon'] }} text-primary" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0 fw-semibold text-dark small">{{ cat['name'] }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<!-- Featured Products Section -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Featured Products</h2>
+            <a href="/products" class="btn btn-outline-primary btn-sm">View All</a>
+        </div>
+        <div class="row g-4">
+            {% if products %}
+                {% for product in products %}
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="card h-100 shadow-sm border-0 product-card">
+                        <img src="{{ product['image_url'] }}"
+                             class="card-img-top"
+                             alt="{{ product['name'] }}"
+                             style="height: 200px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge bg-primary mb-2 align-self-start">{{ product['category'] }}</span>
+                            <h6 class="card-title fw-bold">{{ product['name'] }}</h6>
+                            <p class="text-muted small flex-grow-1">{{ product['description'][:60] }}...</p>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="fs-5 fw-bold text-primary">₹{{ "%.2f"|format(product['price']) }}</span>
+                                <a href="/products/{{ product['id'] }}" class="btn btn-primary btn-sm">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">No products found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Recommended Section (AI Powered) -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">
+                <i class="bi bi-stars text-warning me-2"></i>Recommended for You
+                <span class="badge bg-warning text-dark ms-2" style="font-size: 0.5rem;">AI Powered</span>
+            </h2>
+        </div>
+
+        {% if session.get('user_id') %}
+            {% if recommendations %}
+                <div class="row g-4">
+                    {% for product in recommendations %}
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="card h-100 shadow-sm border-0 product-card">
+                            <img src="{{ product['image_url'] }}"
+                                 class="card-img-top"
+                                 alt="{{ product['name'] }}"
+                                 style="height: 200px; object-fit: cover;">
+                            <div class="card-body d-flex flex-column">
+                                <span class="badge bg-info text-dark mb-2 align-self-start">
+                                    {{ product['reason'] }}
+                                </span>
+                                <span class="badge bg-primary mb-2 align-self-start">{{ product['category'] }}</span>
+                                <h6 class="card-title fw-bold">{{ product['name'] }}</h6>
+                                <p class="text-muted small flex-grow-1">{{ product['description'][:60] }}...</p>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="fs-5 fw-bold text-primary">₹{{ "%.2f"|format(product['price']) }}</span>
+                                    <a href="/products/{{ product['id'] }}" class="btn btn-primary btn-sm">View</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-robot me-2"></i>
+                    Browse some products to get personalized recommendations!
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-robot me-2"></i>
+                <a href="/login" class="fw-bold">Login</a> to get AI powered recommendations!
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

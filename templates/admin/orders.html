@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% block title %}ShopAI - Admin Orders{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-2 admin-sidebar rounded-4 py-4 me-3">
+            <h6 class="text-white fw-bold px-3 mb-4">
+                <i class="bi bi-speedometer2 me-2"></i>Admin Panel
+            </h6>
+            <nav class="nav flex-column">
+                <a class="nav-link" href="/admin">
+                    <i class="bi bi-house me-2"></i>Dashboard
+                </a>
+                <a class="nav-link" href="/admin/products">
+                    <i class="bi bi-box me-2"></i>Products
+                </a>
+                <a class="nav-link" href="/admin/orders">
+                    <i class="bi bi-bag me-2"></i>Orders
+                </a>
+                <a class="nav-link" href="/admin/categories">
+                    <i class="bi bi-tags me-2"></i>Categories
+                </a>
+                <hr class="border-secondary">
+                <a class="nav-link text-danger" href="/logout">
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <h3 class="fw-bold mb-4">All Orders</h3>
+
+            <!-- Fraud Risk Alerts -->
+            {% for order in orders %}
+                {% if order['fraud_risk_score'] >= 0.6 %}
+                <div class="alert alert-danger mb-2">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>HIGH RISK!</strong> Order #{{ order['id'] }} by {{ order['user_name'] }}
+                    — Score: {{ order['fraud_risk_score'] }}
+                    {% if order['fraud_reasons'] %}
+                        | Reasons: {{ order['fraud_reasons'] | join(', ') }}
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <!-- Pie Chart -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2"></i>Risk Distribution</h6>
+                            <canvas id="riskPieChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bar Chart -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart me-2"></i>Risk Scores per Order</h6>
+                            <canvas id="riskBarChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Risk Score</th>
+                                    <th>Risk Level</th>
+                                    <th>Reasons</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr class="{% if order['fraud_risk_score'] >= 0.6 %}table-danger{% elif order['fraud_risk_score'] >= 0.3 %}table-warning{% endif %}">
+                                    <td><strong>#{{ order['id'] }}</strong></td>
+                                    <td>
+                                        <p class="mb-0 fw-semibold small">{{ order['user_name'] }}</p>
+                                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">{{ order['user_email'] }}</p>
+                                    </td>
+                                    <td class="text-primary fw-bold">₹{{ "%.2f"|format(order['total_amount']) }}</td>
+                                    <td>
+                                        <form method="POST" action="/admin/orders/update-status">
+                                            <input type="hidden" name="order_id" value="{{ order['id'] }}">
+                                            <select name="status" class="form-select form-select-sm"
+                                                    onchange="this.form.submit()" style="width: 130px;">
+                                                <option value="pending" {% if order['status'] == 'pending' %}selected{% endif %}>
+                                                    🕐 Pending
+                                                </option>
+                                                <option value="confirmed" {% if order['status'] == 'confirmed' %}selected{% endif %}>
+                                                    ✅ Confirmed
+                                                </option>
+                                                <option value="shipped" {% if order['status'] == 'shipped' %}selected{% endif %}>
+                                                    🚚 Shipped
+                                                </option>
+                                                <option value="delivered" {% if order['status'] == 'delivered' %}selected{% endif %}>
+                                                    📦 Delivered
+                                                </option>
+                                                <option value="cancelled" {% if order['status'] == 'cancelled' %}selected{% endif %}>
+                                                    ❌ Cancelled
+                                                </option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td><strong>{{ order['fraud_risk_score'] }}</strong></td>
+                                    <td>
+                                        <span class="badge bg-{{ order['risk_color'] }} {% if order['risk_color'] == 'warning' %}text-dark{% endif %}">
+                                            {{ order['risk_level'] }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if order['fraud_reasons'] %}
+                                            <ul class="mb-0 ps-3" style="font-size: 0.75rem;">
+                                                {% for reason in order['fraud_reasons'] %}
+                                                <li>{{ reason }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <span class="text-muted small">None</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="small text-muted">{{ order['created_at'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Data from orders
+    const orders = {{ orders | tojson }};
+
+    // Count risk levels
+    let low = 0, medium = 0, high = 0;
+    const orderIds = [];
+    const riskScores = [];
+    const barColors = [];
+
+    orders.forEach(order => {
+        orderIds.push('#' + order.id);
+        riskScores.push(order.fraud_risk_score);
+
+        if (order.fraud_risk_score >= 0.6) {
+            high++;
+            barColors.push('rgba(220, 53, 69, 0.8)');
+        } else if (order.fraud_risk_score >= 0.3) {
+            medium++;
+            barColors.push('rgba(255, 193, 7, 0.8)');
+        } else {
+            low++;
+            barColors.push('rgba(25, 135, 84, 0.8)');
+        }
+    });
+
+    // Pie Chart
+    new Chart(document.getElementById('riskPieChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Low Risk ✅', 'Medium Risk ⚡', 'High Risk ⚠️'],
+            datasets: [{
+                data: [low, medium, high],
+                backgroundColor: [
+                    'rgba(25, 135, 84, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Bar Chart
+    new Chart(document.getElementById('riskBarChart'), {
+        type: 'bar',
+        data: {
+            labels: orderIds,
+            datasets: [{
+                label: 'Fraud Risk Score',
+                data: riskScores,
+                backgroundColor: barColors,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1.0,
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

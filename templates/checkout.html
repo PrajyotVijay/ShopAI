@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% block title %}ShopAI - Checkout{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4"><i class="bi bi-credit-card me-2"></i>Checkout</h2>
+
+        {% if cart_items %}
+        <div class="row">
+            <!-- Checkout Form -->
+            <div class="col-md-7 mb-4">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+
+                        <!-- Delivery Details -->
+                        <h5 class="fw-bold mb-3"><i class="bi bi-truck me-2"></i>Delivery Details</h5>
+                        <form method="POST" action="/checkout">
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold small">Full Name</label>
+                                    <input type="text" name="name" class="form-control"
+                                           value="{{ session.get('user_name') }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold small">Phone Number</label>
+                                    <input type="tel" name="phone" class="form-control"
+                                           placeholder="Enter phone number" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Email</label>
+                                <input type="email" name="email" class="form-control"
+                                       value="{{ session.get('user_email') }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Delivery Address</label>
+                                <textarea name="address" class="form-control" rows="3"
+                                          placeholder="Enter your full address" required></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold small">City</label>
+                                    <input type="text" name="city" class="form-control"
+                                           placeholder="Enter city" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold small">PIN Code</label>
+                                    <input type="text" name="pincode" class="form-control"
+                                           placeholder="Enter PIN code" required>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Payment Method -->
+                            <h5 class="fw-bold mb-3"><i class="bi bi-wallet2 me-2"></i>Payment Method</h5>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="form-check payment-option border rounded-3 p-3">
+                                        <input class="form-check-input" type="radio" name="payment_method"
+                                               value="card" id="card" checked>
+                                        <label class="form-check-label fw-semibold" for="card">
+                                            <i class="bi bi-credit-card text-primary me-2"></i>Card
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check payment-option border rounded-3 p-3">
+                                        <input class="form-check-input" type="radio" name="payment_method"
+                                               value="upi" id="upi">
+                                        <label class="form-check-label fw-semibold" for="upi">
+                                            <i class="bi bi-phone text-success me-2"></i>UPI
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check payment-option border rounded-3 p-3">
+                                        <input class="form-check-input" type="radio" name="payment_method"
+                                               value="cod" id="cod">
+                                        <label class="form-check-label fw-semibold" for="cod">
+                                            <i class="bi bi-cash text-warning me-2"></i>COD
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dummy Card Details -->
+                            <div id="card-details">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Card Number</label>
+                                    <input type="text" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold small">Expiry Date</label>
+                                        <input type="text" class="form-control" placeholder="MM/YY" maxlength="5">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold small">CVV</label>
+                                        <input type="text" class="form-control" placeholder="123" maxlength="3">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3">
+                                <i class="bi bi-lock me-2"></i>Place Order — ₹{{ "%.2f"|format(total) }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-md-5">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Order Summary</h5>
+                        <hr>
+                        {% for item in cart_items %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <p class="mb-0 fw-semibold small">{{ item['name'] }}</p>
+                                <p class="text-muted small mb-0">Qty: {{ item['quantity'] }}</p>
+                            </div>
+                            <span class="fw-bold small">₹{{ "%.2f"|format(item['price'] * item['quantity']) }}</span>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Subtotal</span>
+                            <span>₹{{ "%.2f"|format(total) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Delivery</span>
+                            <span class="text-success">FREE</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Total</span>
+                            <span class="text-primary">₹{{ "%.2f"|format(total) }}</span>
+                        </div>
+
+                        <!-- Security Badge -->
+                        <div class="alert alert-success mt-3 small">
+                            <i class="bi bi-shield-check me-2"></i>
+                            Your order is protected by our AI Fraud Detection system!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+            <h4 class="mt-3 text-muted">Your cart is empty!</h4>
+            <a href="/products" class="btn btn-primary mt-2">Browse Products</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Show/hide card details based on payment method
+document.querySelectorAll('input[name="payment_method"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        let cardDetails = document.getElementById('card-details');
+        if (this.value === 'card') {
+            cardDetails.style.display = 'block';
+        } else {
+            cardDetails.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}
